@@ -2,11 +2,13 @@
 let path = require('path');
 let rootdir = path.resolve(__dirname, '../../'); // 工程根路径
 const conf = {
-    project: '/',
+  project: '/koa2',
     port: 3000,
     rootdir: rootdir,
     env: process.env.NODE_ENV || 'develpoment',
     dist: 'dist', // webpack打包输出路径
+  defaultPage: 'index.html',
+  allowedFileExtension: ['.js', '.css', '.html'], // 定义允许下载的文件类型
     log4js: {
         level: 'debug',
         output: path.join(rootdir, 'logs/app.log'),
