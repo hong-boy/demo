@@ -2,21 +2,25 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import ElementUI from 'element-ui'
-import routes from './routes'
+import router from './routes'
 import LayoutView from './layout.vue'
+import IOT from './utils/common.js'
+import 'element-ui/lib/theme-default/index.css'
 
 Vue.use(VueRouter);
 Vue.use(ElementUI);
 
-routes.beforeEach((to, from, next)=> {
+window.IOT = IOT;
+
+router.beforeEach((to, from, next)=> {
     console.log(to, from);
     next();
 });
 
 new Vue({
-    el: '#layout',
-    router: routes,
-    render: (create)=> {
-        create(LayoutView);
-    }
+  el: '#layout',
+  router: router,
+  render: function (create) {
+    return create(LayoutView);
+  }
 });

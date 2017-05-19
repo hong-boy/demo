@@ -8,6 +8,7 @@ const bunyan = require('koa-bunyan-logger');
 const path = require('path');
 const fs = require('mz/fs');
 const send = require('koa-send');
+const historyFallback = require('koa2-history-api-fallback');
 
 const conf = require('./config/env');
 const proxy = require('koa-router')();
@@ -18,7 +19,11 @@ const staticPath = path.join(__dirname, conf.dist);
 onerror(app);
 
 // logger - bunyan
-app.use(bunyan());
+//app.use(bunyan());
+
+// connect-history-api-fallback
+//此插件会拦截所有GET|HEAD请求
+app.use(historyFallback({index: ['/', conf.defaultPage].join(''), verbose: true}));
 
 // static serve
 app.use(async (ctx, next)=> {
@@ -29,7 +34,8 @@ app.use(async (ctx, next)=> {
     let flag = await fs.exists(path.join(staticPath, cpath));
     if(flag){
       // 生产环境会使用webpack打包，自动为静态资源添加md5前缀，故无需担心静态资源缓存问题
-      await send(ctx, cpath, {maxage:604800000, immutable:true, root: staticPath});
+      //await send(ctx, cpath, {maxage:604800000, immutable:true, root: staticPath});
+      await send(ctx, cpath, {maxage: 0, immutable: false, root: staticPath});
     }else {
       await next();
     }

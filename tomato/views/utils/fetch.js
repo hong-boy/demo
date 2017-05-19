@@ -5,7 +5,9 @@ import _ from 'lodash'
 
 es6Promise.polyfill(); // 浏览器兼容Promise
 
-const BASE_API_URL = 'api/';
+const BASE_API_URL = '';
+
+const regx4url = /^\//;
 
 const OPTIONS = {
     method: 'POST',
@@ -19,6 +21,25 @@ const OPTIONS = {
         'Content-Type': 'application/json; charset=UTF-8'
     }
 };
+
+function _formatUrl(url) {
+  return [BASE_API_URL, url].join('').replace(regx4url, '');
+}
+
+function _handleResponse(resp) {
+  let ret = null;
+  if (resp.status != 200) {
+    let error = Error(resp.statusText);
+    error.code = resp.status;
+    error.response = resp;
+    ret = error;
+  } else {
+    // 默认只处理JSON
+    ret = resp.json();
+  }
+  return ret;
+}
+
 /**
  * 向后台请求数据
  * （默认暴露）
@@ -28,10 +49,11 @@ const OPTIONS = {
  * @param{function} succ - 请求成功时回调函数|必须
  * @param{function} fail - 请求失败时回调|可选
  * @param{json object} overlay - loading框效果|可选
+ * @returns{Promise}
  */
-export function fetch(url, data, succ, fail, overlay) {
+export function fetchBak(url, data, succ, fail, overlay) {
     let option = _.extend({}, OPTIONS, {body: JSON.stringify(data)});
-    iFetch(path.join(BASE_API_URL, url), option)
+  return iFetch(_formatUrl(url), option)
         .then(function (resp) {
             if (resp.status != 200) {
                 let error = Error(resp.statusText);
@@ -54,4 +76,29 @@ export function fetch(url, data, succ, fail, overlay) {
             fail = _.isFunction(fail) ? fail : console.error;
             fail(err);
         });
+}
+
+/**
+ * 向后台请求JSON格式数据
+ * @param url
+ * @param data
+ * @param overlay
+ * @returns {Promise}
+ */
+export function fetch(url, data, overlay) {
+  let option = _.extend({}, OPTIONS, {body: JSON.stringify(data)});
+  let promise = new Promise(async (resolve, reject)=> {
+    try {
+      let resp = await iFetch(_formatUrl(url), option);
+      let result = _handleResponse(resp);
+      if (_.isError(result)) {
+        reject(result);
+      } else {
+        resolve(result);
+      }
+    } catch (e) {
+      reject(e);
+    }
+  });
+  return promise;
 }
