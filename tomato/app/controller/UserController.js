@@ -18,13 +18,14 @@ exports.signin = async function (ctx, next) {
       return;
     }
     // 将User存储到Session
-    ctx.login(result, (err, user)=> {
+    ctx.login(result, (err) => {
       if (err) {
         logger.error('Serialize user into Session failed!', err);
         bean.status = ResponseBean.STATUS.ERROR;
         bean.msg = err;
       } else {
-        bean.data = user;
+        delete result['password'];
+        bean.data = result;
       }
       ctx.body = bean;
     });

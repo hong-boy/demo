@@ -26,16 +26,12 @@ let canAccessPath = function (ctx) {
     privs = user.privs || {},
     full = privs.full || [],
     fuzzy = privs.fuzzy || [];
-  //检查是否是白名单项
-  flag = lodash.includes(WHITE_LIST, path);
-  if (!flag) {
-    // 检测是否满足模糊匹配
-    flag = lodash.find(fuzzy, (url)=> {
-      return path.startsWith(url);
-    });
-    // 检测是否满足全匹配
-    !flag && (flag = lodash.includes(full, path));
-  }
+  // 检测是否满足模糊匹配
+  flag = lodash.find(fuzzy, (url) => {
+    return path.startsWith(url);
+  });
+  // 检测是否满足全匹配
+  !flag && (flag = lodash.includes(full, path));
   return flag;
 };
 
@@ -47,15 +43,17 @@ let canAccessPath = function (ctx) {
  * @param next
  */
 let auth = async function (ctx, next) {
-  if (ctx.isAuthenticated() || canAccessPath(ctx)) {
+  if ((lodash.includes(WHITE_LIST, cleanPath(ctx.path)))
+    || (ctx.isAuthenticated() && canAccessPath(ctx))) {
     await next();
   } else {
     let isXHR = ctx.get('x-requested-with') === 'Fetch';
+    let isUnauth = ctx.isUnauthenticated();
     if (isXHR) {
-      ctx.status = 401;
-      ctx.body = '请先登录！';
+      ctx.status = isUnauth ? 408 : 401;
+      ctx.body = isUnauth ? '请先登录!' : '没有权限!';
     } else {
-      ctx.redirect(`${project}/login`);
+      ctx.redirect(`${project}${isUnauth ? '/login' : '/404'}`);
     }
   }
 };

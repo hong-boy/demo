@@ -2,6 +2,7 @@ import es6Promise from 'es6-promise'
 import iFetch from 'isomorphic-fetch'
 import path from 'path'
 import _ from 'lodash'
+import {Message} from 'element-ui';
 
 es6Promise.polyfill(); // 浏览器兼容Promise
 
@@ -34,8 +35,22 @@ function _handleResponse(resp) {
   let error = new Error();
   // 处理http request error
   switch (resp.status) {
-    case 500:
+    case 401:
     {
+      // 没有权限
+      console.error(resp);
+      Message.error({
+        showClose: true,
+        message: '没有权限'
+      });
+      break;
+    }
+    case 408: {
+      // session超时或者为空
+      console.error(resp);
+      IOT.removeUserInfo();
+      IOT.redirect2Home();
+      break;
     }
     default:
     {

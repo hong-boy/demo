@@ -13,10 +13,33 @@ let _getNamespaceKey = function (key) {
 };
 
 /**
- * 加载session对象
+ * 从sessionStorage获取用户信息
  */
-let loadSession = function () {
-  return JSON.parse(window.sessionStorage.getItem('session') || null);
+let loadUserInfo = function () {
+  return loadSession('userInfo');
+};
+
+/**
+ * 存储用户信息
+ * @param user
+ */
+let restoreUserInfo = function (user) {
+  restoreSession('userInfo', user);
+};
+
+/**
+ * 移除用户信息
+ */
+let removeUserInfo = function () {
+  removeSession('userInfo');
+};
+
+/**
+ * 获取sessionstorage中存储的对象
+ * @param key
+ */
+let loadSession = function (key) {
+  return JSON.parse(window.sessionStorage.getItem(_getNamespaceKey(key)) || null);
 };
 
 /**
@@ -45,10 +68,9 @@ let removeSession = function (key) {
  * @param session
  */
 let auth = function (path) {
-  let session = loadSession(),
-    pages = session.pages || {},
-    fulls = pages.full,
-    fuzzys = pages.fuzzy;
+  let userInfo = loadUserInfo() || {},
+    fulls = userInfo.full || [],
+    fuzzys = userInfo.fuzzy || [];
   // check full firstly
   let isFull = lodash.findIndex(fulls, (page)=> page === path) !== -1;
   // check fuzzy
@@ -63,11 +85,22 @@ let redirect2Home = function () {
   location.href = 'index';
 };
 
+/**
+ * 跳转至404页面
+ */
+let redirect2NotFound = function () {
+  location.href = '404';
+};
+
 export default {
   fetch,
+  loadUserInfo,
+  removeUserInfo,
+  restoreUserInfo,
   loadSession,
   restoreSession,
   removeSession,
   auth,
   redirect2Home,
+  redirect2NotFound,
 }

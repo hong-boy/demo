@@ -34,12 +34,12 @@ export default {
               showClose: true,
               message: '登录成功'
             });
-            IOT.restoreSession('userInfo', result);
+            IOT.restoreUserInfo(result.data);
             IOT.redirect2Home();
           } else {
             thiz.$message({
               showClose: true,
-              message: result.message || '登录失败',
+              message: result.msg || '登录失败',
               type: 'error'
             });
           }
