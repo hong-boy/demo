@@ -6,6 +6,7 @@ import router from './routes'
 import LayoutView from './layout.vue'
 import IOT from './utils/common.js'
 import 'element-ui/lib/theme-default/index.css'
+import './assets/less/common.less'
 
 Vue.use(VueRouter);
 Vue.use(ElementUI);

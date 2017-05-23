@@ -6,4 +6,6 @@ router.post('/signin', UserCtrl.signin);
 
 router.post('/signout', UserCtrl.signout);
 
+router.post('/list', UserCtrl.list);
+
 module.exports = router;

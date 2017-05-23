@@ -7,6 +7,7 @@
 var app = require('../app');
 var http = require('http');
 var conf = require('../config/env.js');
+var logger = require('../app/util/Logger').logger('startup.js');
 
 /**
  * Get port from environment and store in Express.
@@ -82,9 +83,6 @@ function onError(error) {
  */
 
 function onListening() {
-  var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  console.info('Server is ready! Visit http://localhost:' + port + conf.project);
+  let protocol = 'http';
+  logger.info(`Server is ready! Visit on ${protocol}://localhost:${port}${conf.project}`);
 }

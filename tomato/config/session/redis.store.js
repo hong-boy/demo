@@ -1,0 +1,33 @@
+'use strict';
+const Redis = require('ioredis');
+const Store = require('koa-session2').Store;
+const REDIS_CONFIG = require('../env.js').redis;
+const PREFIX = 'SESSION';
+
+class RedisStore extends Store {
+  constructor() {
+    super();
+    this.redis = new Redis(REDIS_CONFIG);
+  }
+
+  async get(sid) {
+    let data = await this.redis.get(`${PREFIX}:${sid}`);
+    return JSON.parse(data);
+  }
+
+  async set(session, {sid=this.getID(24), maxAge=1000000}={}) {
+    console.log('SET', this.redis, this.getId);
+    try {
+      await this.redis.set(`${PREFIX}:${sid}`, JSON.stringify(session), 'EX', maxAge / 1000);
+    } catch (e) {
+      console.error(e);
+    }
+    return sid;
+  }
+
+  async destroy(sid) {
+    return await this.redis.del(`${PREFIX}:${sid}`);
+  }
+}
+
+module.exports = RedisStore;

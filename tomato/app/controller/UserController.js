@@ -1,13 +1,35 @@
 'use strict';
-var conf = require('../../config/env');
-
-const LOGIN_SUCC_URL = [conf.project, '/'].join('');
+var passport = require('koa-passport');
+var logger = require('../util/Logger').logger('UserController');
+var ResponseBean = require('../bean/ResponseBean');
 
 /**
  * 用户登录
  */
 exports.signin = async function (ctx, next) {
-  ctx.body = {userid: 'test', username: 'juve'};
+  let callback = function (err, result) {
+    let bean = new ResponseBean();
+    // 若验证失败
+    if (err) {
+      bean.status = ResponseBean.STATUS.ERROR;
+      bean.msg = err;
+      logger.error('Sign in failed!', err);
+      ctx.body = bean;
+      return;
+    }
+    // 将User存储到Session
+    ctx.login(result, (err, user)=> {
+      if (err) {
+        logger.error('Serialize user into Session failed!', err);
+        bean.status = ResponseBean.STATUS.ERROR;
+        bean.msg = err;
+      } else {
+        bean.data = user;
+      }
+      ctx.body = bean;
+    });
+  };
+  passport.authenticate('local', callback)(ctx, next);
 };
 
 /**
@@ -15,4 +37,11 @@ exports.signin = async function (ctx, next) {
  */
 exports.signout = async function (ctx, next) {
   ctx.body = "登出成功！";
+};
+
+/**
+ * 用户列表
+ */
+exports.list = async function (ctx, next) {
+  ctx.body = new ResponseBean(200, "成功获取用户列表信息！", [{user: 'aa'}]);
 };

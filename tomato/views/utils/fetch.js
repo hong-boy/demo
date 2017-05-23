@@ -10,16 +10,16 @@ const BASE_API_URL = '';
 const regx4url = /^\//;
 
 const OPTIONS = {
-    method: 'POST',
-    body: null,
-    mode: 'same-origin',
-    cache: 'default',
-    credentials: 'include', // 开启cookie支持
-    headers: {
-        'X-Requested-With': 'XMLHttpRequest', //兼容express4 req.xhr
-        'Connection': 'keep-alive',
-        'Content-Type': 'application/json; charset=UTF-8'
-    }
+  method: 'POST',
+  body: null,
+  mode: 'same-origin',
+  cache: 'default',
+  credentials: 'include', // 开启cookie支持
+  headers: {
+    'X-Requested-With': 'Fetch', //兼容express4 req.xhr
+    'Connection': 'keep-alive',
+    'Content-Type': 'application/json; charset=UTF-8'
+  }
 };
 
 function _formatUrl(url) {
@@ -27,17 +27,24 @@ function _formatUrl(url) {
 }
 
 function _handleResponse(resp) {
-  let ret = null;
-  if (resp.status != 200) {
-    let error = Error(resp.statusText);
-    error.code = resp.status;
-    error.response = resp;
-    ret = error;
-  } else {
+  if (resp.status === 200) {
     // 默认只处理JSON
-    ret = resp.json();
+    return resp.json();
   }
-  return ret;
+  let error = new Error();
+  // 处理http request error
+  switch (resp.status) {
+    case 500:
+    {
+    }
+    default:
+    {
+      error.status = 500;
+      error.msg = '一般错误';
+      console.error(error);
+    }
+  }
+  return error;
 }
 
 /**
@@ -52,30 +59,30 @@ function _handleResponse(resp) {
  * @returns{Promise}
  */
 export function fetchBak(url, data, succ, fail, overlay) {
-    let option = _.extend({}, OPTIONS, {body: JSON.stringify(data)});
+  let option = _.extend({}, OPTIONS, {body: JSON.stringify(data)});
   return iFetch(_formatUrl(url), option)
-        .then(function (resp) {
-            if (resp.status != 200) {
-                let error = Error(resp.statusText);
-                error.code = resp.status;
-                error.response = resp;
-                throw error;
-            }
-            return resp.json();
-        })
-        .then(function (ret) {
-            _.isFunction(succ) && succ.call(null, ret);
-        })
-        .catch(function (err) {
-            if (err.code === 301 || err.code === 302) {
-                err.response.json().then(function (ret) {
-                    location.href = ret.url;
-                });
-                return;
-            }
-            fail = _.isFunction(fail) ? fail : console.error;
-            fail(err);
+    .then(function (resp) {
+      if (resp.status != 200) {
+        let error = Error(resp.statusText);
+        error.code = resp.status;
+        error.response = resp;
+        throw error;
+      }
+      return resp.json();
+    })
+    .then(function (ret) {
+      _.isFunction(succ) && succ.call(null, ret);
+    })
+    .catch(function (err) {
+      if (err.code === 301 || err.code === 302) {
+        err.response.json().then(function (ret) {
+          location.href = ret.url;
         });
+        return;
+      }
+      fail = _.isFunction(fail) ? fail : console.error;
+      fail(err);
+    });
 }
 
 /**
@@ -88,17 +95,9 @@ export function fetchBak(url, data, succ, fail, overlay) {
 export function fetch(url, data, overlay) {
   let option = _.extend({}, OPTIONS, {body: JSON.stringify(data)});
   let promise = new Promise(async (resolve, reject)=> {
-    try {
-      let resp = await iFetch(_formatUrl(url), option);
-      let result = _handleResponse(resp);
-      if (_.isError(result)) {
-        reject(result);
-      } else {
-        resolve(result);
-      }
-    } catch (e) {
-      reject(e);
-    }
+    let resp = await iFetch(_formatUrl(url), option);
+    let result = _handleResponse(resp);
+    resolve(result);
   });
   return promise;
 }

@@ -1,5 +1,6 @@
 'use strict';
 import _ from 'lodash'
+import md5 from 'md5'
 export default {
   data() {
     return {
@@ -23,21 +24,24 @@ export default {
       let thiz = this;
       thiz.$refs[form].validate(async function (valid) {
         if (valid) {
-          let result = await IOT.fetch('/user/signin', thiz.form);
-          if (_.isError(result)) {
-            thiz.$message({
-              showClose: true,
-              message: result.message || '登录失败',
-              type: 'error'
-            });
-            console.error(result);
-          } else {
+          let param = {
+            username: thiz.form.username,
+            password: md5(thiz.form.password)
+          };
+          let result = await IOT.fetch('/user/signin', param);
+          if (result.status === 200) {
             thiz.$message({
               showClose: true,
               message: '登录成功'
             });
             IOT.restoreSession('userInfo', result);
             IOT.redirect2Home();
+          } else {
+            thiz.$message({
+              showClose: true,
+              message: result.message || '登录失败',
+              type: 'error'
+            });
           }
         }
         return false;
