@@ -5,7 +5,7 @@ let base = require('./base.conf');
  * 用于开发环境
  */
 module.exports = deepMerge({
-  debug: false,
+  debug: true, // true-开发环境 false-生产环境
   port: 3000,
   env: 'development',
   dist: 'dist/dev',

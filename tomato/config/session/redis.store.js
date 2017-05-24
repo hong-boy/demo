@@ -4,6 +4,9 @@ const Store = require('koa-session2').Store;
 const REDIS_CONFIG = require('../env.js').redis;
 const PREFIX = 'SESSION';
 
+/**
+ * 参考自express-session-redis
+ */
 class RedisStore extends Store {
   constructor() {
     super();
@@ -16,7 +19,6 @@ class RedisStore extends Store {
   }
 
   async set(session, {sid=this.getID(24), maxAge=1000000}={}) {
-    console.log('SET', this.redis, this.getId);
     try {
       await this.redis.set(`${PREFIX}:${sid}`, JSON.stringify(session), 'EX', maxAge / 1000);
     } catch (e) {
