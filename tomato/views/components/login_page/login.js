@@ -28,13 +28,12 @@ export default {
             username: thiz.form.username,
             password: md5(thiz.form.password)
           };
-          let result = await IOT.fetch('/user/signin', param);
+          let result = await IOT.fetch('/login', param);
           if (result.status === 200) {
             thiz.$message({
               showClose: true,
               message: '登录成功'
             });
-            IOT.restoreUserInfo(result.data);
             IOT.redirect2Home();
           } else {
             thiz.$message({

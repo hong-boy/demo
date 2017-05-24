@@ -8,8 +8,9 @@ var roles = require('./roles.conf'),
  * 系统权限索引页
  */
 const WHITE_LIST = [
-  '/user/signin',
-  '/user/signout'
+  '/auth',
+  '/login',
+  '/logout',
 ];
 
 // 组装权限

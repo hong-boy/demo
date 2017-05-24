@@ -27,7 +27,7 @@ async function _logger4req(ctx, next) {
     method = ctx.method,
     params = req.body,
     sTime = Date.now();
-  logger.debug(`Got request [${method} - ${path}]. Parameters: ${JSON.stringify(params)}`);
+  logger.debug(`Got request [${method} - ${path}]. Params: ${JSON.stringify(params)}`);
   await next();
   let statusCode = ctx.status;
   logger.info(`Response for [${method} - ${statusCode} - ${path}]. It takes ${Date.now() - sTime}ms.`);
@@ -37,7 +37,10 @@ async function _logger4req(ctx, next) {
 onerror(app);
 
 // connect-history-api-fallback(此插件会拦截所有GET|HEAD请求)
-app.use(historyFallback({index: ['/', conf.defaultPage].join(''), verbose: conf.debug}));
+app.use(historyFallback({
+  index: ['/', conf.defaultPage].join(''),
+  verbose: conf.debug
+}));
 
 // static serve（因为项目中需要添加逻辑路径，即：conf.project，且ctx.path属于只读权限，故暂且自己实现静态资源服务）
 app.use(async (ctx, next)=> {

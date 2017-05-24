@@ -23,9 +23,6 @@ exports.signin = async function (ctx, next) {
         logger.error('Serialize user into Session failed!', err);
         bean.status = ResponseBean.STATUS.ERROR;
         bean.msg = err;
-      } else {
-        delete result['password'];
-        bean.data = result;
       }
       ctx.body = bean;
     });
@@ -37,7 +34,8 @@ exports.signin = async function (ctx, next) {
  * 用户登出
  */
 exports.signout = async function (ctx, next) {
-  ctx.body = "登出成功！";
+  ctx.logout();
+  ctx.body = new ResponseBean(ResponseBean.STATUS, '登出成功');
 };
 
 /**

@@ -42,6 +42,7 @@ function fetchUser(username, password) {
       result = fakeUser;
       let privs = processPrivsUrl(result.roleId);
       result = lodash.assign(result, privs);
+      console.log(result);
     }
     resolve(result);
   });

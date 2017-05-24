@@ -11,6 +11,14 @@ let homeRouter = {path: '\/(index)?', component: HomePage, children: []};
 const children = homeRouter.children;
 
 routes.push({path: '/login', component: LoginPage});
+routes.push({
+  path: '/logout',
+  component: LoginPage,
+  beforeEnter: async (to, from, next)=> {
+    await IOT.signout();
+    next('/login');
+  }
+});
 routes.push(homeRouter);
 children.push({path: '/', component: MainPage});
 routes.push({path: '/404', component: NotFoundPage});

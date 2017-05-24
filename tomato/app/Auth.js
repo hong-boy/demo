@@ -16,16 +16,16 @@ let cleanPath = function (path) {
 /**
  * 判断用户是否可以访问当前路由
  * @param ctx
+ * @param url 路径
  * @returns {boolean}
  */
-let canAccessPath = function (ctx) {
+let canAccessPath = function (ctx, url) {
   let flag = true,
-    path = cleanPath(ctx.path),
+    path = cleanPath(url || ctx.path),
     session = ctx.session || {},
     user = session.passport ? session.passport.user : {},
-    privs = user.privs || {},
-    full = privs.full || [],
-    fuzzy = privs.fuzzy || [];
+    full = user.full || [],
+    fuzzy = user.fuzzy || [];
   // 检测是否满足模糊匹配
   flag = lodash.find(fuzzy, (url) => {
     return path.startsWith(url);
@@ -46,16 +46,17 @@ let auth = async function (ctx, next) {
   if ((lodash.includes(WHITE_LIST, cleanPath(ctx.path)))
     || (ctx.isAuthenticated() && canAccessPath(ctx))) {
     await next();
+    return;
+  }
+  let isXHR = ctx.get('x-requested-with') === 'Fetch';
+  let isUnauth = ctx.isUnauthenticated();
+  if (isXHR) {
+    ctx.status = isUnauth ? 408 : 401;
+    ctx.body = isUnauth ? '请先登录!' : '没有权限!';
   } else {
-    let isXHR = ctx.get('x-requested-with') === 'Fetch';
-    let isUnauth = ctx.isUnauthenticated();
-    if (isXHR) {
-      ctx.status = isUnauth ? 408 : 401;
-      ctx.body = isUnauth ? '请先登录!' : '没有权限!';
-    } else {
-      ctx.redirect(`${project}${isUnauth ? '/login' : '/404'}`);
-    }
+    ctx.redirect(`${project}${isUnauth ? '/login' : '/404'}`);
   }
 };
 
 module.exports = auth;
+auth.canAccessPath = canAccessPath;

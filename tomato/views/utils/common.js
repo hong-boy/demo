@@ -63,19 +63,19 @@ let removeSession = function (key) {
 };
 
 /**
- * 校验页面访问权限
+ * 从后端校验页面访问权限
  * @param path
- * @param session
+ * @returns {{isLogin: boolean, isAuth: boolean}}
  */
-let auth = function (path) {
-  let userInfo = loadUserInfo() || {},
-    fulls = userInfo.full || [],
-    fuzzys = userInfo.fuzzy || [];
-  // check full firstly
-  let isFull = lodash.findIndex(fulls, (page)=> page === path) !== -1;
-  // check fuzzy
-  let isFuzzy = !isFull && lodash.findIndex(fuzzys, (page)=> path.startsWith(page)) !== -1;
-  return isFull || isFuzzy;
+let auth = async function (path) {
+  let result = {isLogin: false, isAuth: false};
+  try {
+    let bean = await fetch('/auth', {path: path});
+    result = bean.data;
+  } catch (e) {
+    console.error(e);
+  }
+  return result;
 };
 
 /**
@@ -92,6 +92,14 @@ let redirect2NotFound = function () {
   location.href = '404';
 };
 
+/**
+ * 用户登出
+ * @returns {Promise}
+ */
+let signout = function () {
+  return fetch('/logout');
+};
+
 export default {
   fetch,
   loadUserInfo,
@@ -103,4 +111,5 @@ export default {
   auth,
   redirect2Home,
   redirect2NotFound,
+  signout,
 }
