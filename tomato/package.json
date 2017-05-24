@@ -7,7 +7,8 @@
     "watch":"set NODE_ENV=development&&gulp build:dev",
     "build:prod":"set NODE_ENV=production&&gulp build:prod",
     "pkg":"set NODE_ENV=production&&gulp package",
-    "build:dll":"webpack --config config/build/webpack.dll.conf.js"
+    "build:dll":"webpack --config config/build/webpack.dll.conf.js",
+    "test":"mocha --require intelli-espower-loader test/**/*.test.js"
   },
   "dependencies": {
     "connect-history-api-fallback":"^1.3.0",
@@ -66,7 +67,7 @@
     "less":"^2.7.2",
     "less-loader":"^2.2.3",
     "merge-stream":"^1.0.1",
-    "mocha":"^3.2.0",
+    "mocha":"^3.4.1",
     "morgan":"^1.8.1",
     "ora":"^1.1.0",
     "postcss-loader":"^1.3.3",
@@ -80,5 +81,8 @@
     "webpack":"^2.2.0",
     "webpack-merge":"^3.0.0",
     "webpack-stream":"^3.2.0"
+  },
+  "directories":{
+    "test":"test/"
   }
 }

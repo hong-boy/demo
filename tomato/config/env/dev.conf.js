@@ -11,5 +11,6 @@ module.exports = deepMerge({
   dist: 'dist/dev',
   log4js: {
     level: 'debug'
-  }
+  },
+  store: null
 }, base);

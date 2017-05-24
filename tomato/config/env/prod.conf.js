@@ -14,5 +14,6 @@ module.exports = deepMerge({
   session: {
     key: 'prdsid',
     store: new (require('../session/redis.store.js'))()
-  }
+  },
+  store: 'redis'
 }, base);

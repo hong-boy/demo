@@ -33,9 +33,7 @@ const conf = {
     port: 6379,
     db: 15
   },
-  store: {// session、项目中的常量等需要使用第三方存储（redis）
-
-  }
+  store: null // 定义将项目中的常量存储于何处。null:NodeJS内存（默认） redis:Redis服务器
 };
 
 module.exports = conf;
