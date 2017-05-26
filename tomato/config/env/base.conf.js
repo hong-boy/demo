@@ -23,7 +23,7 @@ const conf = {
   },
   session: {
     key: 'sid',
-    store: null, // Session第三方存储
+      store: undefined, // Session第三方存储
     maxAge: 3600 * 1000, // 60mins
     httpOnly: true,
     path: project

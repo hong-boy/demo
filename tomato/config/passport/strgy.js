@@ -2,19 +2,27 @@
 const passport = require('koa-passport');
 const lodash = require('lodash/object');
 const conf = require('../privs.js');
+const StoreUtil = require('../../app/util/Store');
+const PREFIX_4_ROLE = 'koa:role';
+const MAXAGE_4_ROLE = require('../env.js').session.maxAge;
 
 /**
  * 根据用户角色ID获取用户权限
- * TODO 将用户角色缓存到第三方存储
  * @param roleId
  * @returns {{fuzzy: Array, full: Array}}
  */
-function processPrivsUrl(roleId) {
+async function processPrivsUrl(roleId) {
   let result = {fuzzy: [], full: []},
-    privsList = conf.roles[roleId].privs,
-    cFull = conf.privs.full,
-    cFuzzy = conf.privs.fuzzy;
+      sid = `${PREFIX_4_ROLE}:${roleId}`,
+      cache = await StoreUtil.get(sid);
 
+    if (cache) {
+        return cache;
+    }
+
+    let privsList = conf.roles[roleId].privs,
+        cFull = conf.privs.full,
+        cFuzzy = conf.privs.fuzzy;
   privsList.forEach(pid=> {
     if (cFull[pid]) {
       result.full.push(cFull[pid]);
@@ -24,6 +32,8 @@ function processPrivsUrl(roleId) {
       // do nothing
     }
   });
+    // 缓存角色对象
+    StoreUtil.set(sid, result, MAXAGE_4_ROLE);
 
   return result;
 }
@@ -34,19 +44,16 @@ function processPrivsUrl(roleId) {
  * @param password
  * @returns {Promise}
  */
-function fetchUser(username, password) {
+async function fetchUser(username, password) {
   let fakeUser = {"username": "admin", "password": "21232f297a57a5a743894a0e4a801fc3", "roleId": 1};
-  let promise = new Promise((resolve)=> {
     let result = null;
     if (username === fakeUser.username && password === fakeUser.password) {
-      result = fakeUser;
-      let privs = processPrivsUrl(result.roleId);
-      result = lodash.assign(result, privs);
-      console.log(result);
+        result = fakeUser;
+        let privs = await processPrivsUrl(result.roleId);
+        result = lodash.assign(result, privs);
+        console.debug(result);
     }
-    resolve(result);
-  });
-  return promise;
+    return result;
 }
 
 /**

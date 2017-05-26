@@ -12,6 +12,7 @@ class Store {
   constructor() {
     this._map = new Map();
     this._timers = new Map();
+      console.warn('You are using memory cache. Please make sure change to "RedisStore" in production!');
   }
 
   getID(key) {
