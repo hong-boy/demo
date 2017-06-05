@@ -10,7 +10,7 @@ const rootdir = app.rootdir;
 const conf = {
   entry: {
     babelMain: 'babel-polyfill',
-    main: path.join(rootdir, 'views', 'main.js')
+      main: path.join(rootdir, 'src/views', 'main.js')
   },
   output: {
     path: path.join(rootdir, dist),
@@ -41,7 +41,7 @@ const conf = {
       inject: true,
       project: app.project,
       filename: 'index.html',
-      template: path.resolve(rootdir, 'views', 'index.html')
+        template: path.resolve(rootdir, 'src/views', 'index.html')
     }),
     new webpack.optimize.CommonsChunkPlugin({
       name: "common",

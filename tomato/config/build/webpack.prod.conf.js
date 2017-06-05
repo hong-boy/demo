@@ -18,6 +18,10 @@ module.exports = merge(base, {
                 warnings: false
             }
         }),
+        new webpack.optimize.CommonsChunkPlugin({
+            name: "common",
+            filename: "[name].bundle.[hash].js"
+        }),
         new webpack.DefinePlugin({
             "process.env": {
                 NODE_ENV: JSON.stringify("production")

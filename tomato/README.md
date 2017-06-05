@@ -1,21 +1,51 @@
 ## koa2 + Vue2.0
 
-### 目录说明
----
-├─app                                                                                                                                                                                                                                                                                                              
-│  ├─controller                                                                                                                                                                                                                                                                                                   
-│  ├─routes                                                                                                                                                                                                                                                                                                       
-│  └─util                                                                                                                                                                                                                                                                                                         
-├─bin                                                                                                                                                                                                                                                                                                              
-├─config                                                                                                                                                                                                                                                                                                           
-│  ├─build                                                                                                                                                                                                                                                                                                        
-│  └─env                                                                                                                                                                                                                                                                                                          
-├─dist                                                                                                                                                                                                                                                                                                             
-├─logs                                                                                                                                                                                                                                                                                                             
-├─test                                                                                                                                                                                                                                                                                                             
-└─views 
+* 环境依赖
+* 开始
+* 目录结构说明
+* 目标
 
+### 环境依赖
+* Nodejs 7或者babel编译
+
+### 开始
+* 安装依赖：```npm install```
+* 启动：```npm run start```
+* webpack实时编译：```npm run watch```
+* 生产环境打包：```npm run pkg```
+* 单元测试：```npm test```
+* 代码覆盖率：```npm run test:cover```
+
+### 目录结构说明
+```
 ---
+├─bin  
+├─config  
+│  ├─build  
+│  ├─env  
+│  ├─passport  
+│  ├─privs  
+│  └─session  
+├─coverage  
+├─dist  
+├─logs  
+├─src  
+│  ├─app  
+│  │  ├─bean  
+│  │  ├─controller  
+│  │  ├─route  
+│  │  └─util  
+│  └─views  
+│      ├─assets  
+│      │  ├─image  
+│      │  └─less  
+│      ├─components  
+│      │  ├─common  
+│      ├─routes  
+│      └─utils  
+└─test  
+---
+```
 
 ### 目标
 1. Vue2作为视图层，Koa2作为控制层

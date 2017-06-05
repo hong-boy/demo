@@ -12,11 +12,11 @@ const send = require('koa-send');
 const lodash = require('lodash/object');
 const historyFallback = require('koa2-history-api-fallback');
 
-const conf = require('./config/env');
+const conf = require('./../config/env');
 const auth = require('./app/Auth.js');
-require('./config/passport/strgy.js');
+require('./../config/passport/strgy.js');
 const proxy = require('koa-router')();
-const router = require('./app/route');
+const router = require('./app/route/index');
 const logger = require('./app/util/Logger').logger('app.js');
 const staticPath = path.join(__dirname, conf.dist);
 
@@ -31,6 +31,17 @@ async function _logger4req(ctx, next) {
   await next();
   let statusCode = ctx.status;
   logger.info(`Response for [${method} - ${statusCode} - ${path}]. It takes ${Date.now() - sTime}ms.`);
+}
+/**
+ *  为session指定SessionStore
+ * @param session
+ */
+function _initSession(session) {
+    let SessionStore = session.store;
+    if (SessionStore) {
+        session.store = new SessionStore();
+    }
+    return session;
 }
 
 // error handler
@@ -67,7 +78,7 @@ app.use(proxy.routes(), proxy.allowedMethods());
 
 proxy.use(
   conf.project,
-  session(conf.session),
+    session(_initSession(conf.session)),
   bodyparser,
   passport.initialize({userProperty: 'user'}),
   passport.session(),

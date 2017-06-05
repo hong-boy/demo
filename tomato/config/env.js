@@ -8,6 +8,7 @@ if (process && process.env && process.env.NODE_ENV) {
 } else {
     console.info('No NODE_ENV specified! It will use [dev.conf.js] as default...');
 }
+
 configure = isProd ? require('./env/prod.conf') : require('./env/dev.conf');
 
 module.exports = configure;

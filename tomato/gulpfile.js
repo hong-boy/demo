@@ -6,16 +6,14 @@ var gulp = require('gulp'),
     watch = require('gulp-watch'),
     notify = require('gulp-notify'),
     clean = require('gulp-clean'),
-//mergeStream = require('merge-stream'),
-//    zip = require('zip-local'),
     path = require('path'),
     _ = require('lodash');
 
 var app = require('./config/env');
 const rootdir = app.rootdir;
-//const zipPath = path.join(rootdir, '../baasbs.zip');
 const distPath = app.dist;
-console.log(distPath);
+const zipFileName = require('./package.json').name + '.zip';
+const zipDestPath = __dirname;
 
 var tasks = {
     /**
@@ -50,13 +48,13 @@ var tasks = {
      */
     'webpackdev': {
         excute: function () {
-            gulp.src(path.resolve(rootdir, 'views/main.js'))
+            return gulp.src(path.resolve(rootdir, 'views/main.js'))
                 .pipe(gulpWebpack(require('./config/build/webpack.dev.conf.js'), webpack))
                 .pipe(gulp.dest(distPath));
         }
     },
     /**
-     * webpack生成环境编译
+     * webpack生产环境编译
      */
     'webpackprod': {
         excute: function () {
@@ -66,14 +64,118 @@ var tasks = {
         }
     },
     /**
+     * 清除zip
+     */
+    'cleanZip': {
+        excute: function () {
+            return gulp.src(zipDestPath + zipFileName, {read: false})
+                .pipe(clean())
+                .on('end', ()=> {
+                    notify({message: 'Clean zip before package...'});
+                });
+        }
+    },
+    /**
      * 项目打包-zip
      */
     'package': {
         excute: function () {
-            //zip.sync.zip(rootdir).compress().save(zipPath);
+            const list = [
+                path.join(__dirname, '**', '*.*'),
+                '.babelrc',
+                //'!./node_modules/**/*.*',
+                '!./coverage/**/*.*',
+                '!./test/**/*.*',
+                '!./src/views/**/*.*',
+                '!./.git/**/*.*',
+                '!./.idea/**/*.*',
+                '!./README.md',
+                '!./logs/*.log.*',
+                '!./gulpfile.js',
+                '!./*.zip'
+            ];
+            gulp.src(list)
+                .pipe(GulpZipEnhancePlugin(zipFileName, {
+                    mode4file: parseInt('0100766', 8), // -rwxrw-rw-
+                    mode4directory: parseInt('0100755', 8) // drwxr-xr-x
+                }))
+                .pipe(gulp.dest(zipDestPath))
+                .pipe(notify({message: 'Packaging...'}));
         }
     }
 };
+
+/**
+ * gulp-zip改进
+ * Issue: Linux中会存在文件读写权限缺失
+ * Enhancement：将mode暴露出来
+ */
+var GulpZipEnhancePlugin = (function () {
+    let through2 = require('through2');
+    let Yazl = require('yazl');
+    let getStream = require('get-stream');
+    let gutil = require('gulp-util');
+    let GulpZipPlugin = function (filename, options) {
+        let firstFile = null,
+            zip = new Yazl.ZipFile();
+        let opts = Object.assign({
+            compress: true,
+            mtime: new Date(),
+            mode4file: null,
+            mode4directory: null
+        }, options);
+        filename = filename || 'unnamed.zip';
+        return through2.obj(function (file, encode, callback) {
+            if (!firstFile) {
+                firstFile = file;
+            }
+            // Because Windows...
+            const pathname = file.relative.replace(/\\/g, '/');
+            if (!pathname) {
+                return cb();
+            }
+            if (file.isNull() && file.stat && file.stat.isDirectory && file.stat.isDirectory()) {
+                zip.addEmptyDirectory(pathname, {
+                    mtime: file.stat.mtime || opts.mtime,
+                    mode: opts.mode4directory ? opts.mode4directory : file.stat.mode // parseInt("0100755", 8) // -rwxr-xr-x
+                });
+            } else {
+                const stat = {
+                    compress: opts.compress,
+                    mtime: file.stat ? file.stat.mtime : opts.mtime,
+                    mode: opts.mode4file ? opts.mode4file : file.stat.mode //parseInt("0100766", 8) // -rwxrw-rw-
+                };
+
+                if (file.isStream()) {
+                    zip.addReadStream(file.contents, pathname, stat);
+                }
+
+                if (file.isBuffer()) {
+                    zip.addBuffer(file.contents, pathname, stat);
+                }
+            }
+            callback();
+        }, function (cb) {
+            if (!firstFile) {
+                return cb();
+            }
+
+            getStream.buffer(zip.outputStream).then(data => {
+                this.push(new gutil.File({
+                    cwd: firstFile.cwd,
+                    base: firstFile.base,
+                    path: path.join(firstFile.base, filename),
+                    contents: data
+                }));
+
+                cb(); // eslint-disable-line promise/no-callback-in-promise
+            });
+
+            zip.end();
+        });
+    };
+    return GulpZipPlugin;
+})();
 
 function TaskExecuter(gulp, tasks) {
     if (!_.isObject(tasks)) {
@@ -120,13 +222,14 @@ gulp.task('build:dev', function () {
     executer.excute();
 });
 
-//gulp.task('package', function () {
-//    let taskList = {
-//        clean: tasks.clean,
-//        dll: tasks.compileDll,
-//        prod: tasks.webpackprod,
-//        package: tasks.package
-//    };
-//    let executer = new TaskExecuter(gulp, taskList);
-//    executer.excute();
-//});
+gulp.task('package', function () {
+    let taskList = {
+        clean: tasks.clean,
+        dll: tasks.compileDll,
+        prod: tasks.webpackprod,
+        cleanZip: tasks.cleanZip,
+        package: tasks.package
+    };
+    let executer = new TaskExecuter(gulp, taskList);
+    executer.excute();
+});

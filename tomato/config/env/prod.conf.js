@@ -13,7 +13,7 @@ module.exports = deepMerge({
   },
   session: {
     key: 'prdsid',
-    store: new (require('../session/redis.store.js'))()
+      store: require('../session/redis.store.js') // 传入SessionStore类
   },
   store: 'redis'
 }, base);

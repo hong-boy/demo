@@ -1,6 +1,6 @@
 'use strict';
 const assert = require('power-assert');
-const StoreUtil = require('../../../app/util/Store.js').StoreUtil;
+const StoreUtil = require('../.././util/Store.js').StoreUtil;
 
 describe('app/util/Store.js', function () {
   beforeEach(function () {
