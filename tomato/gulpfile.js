@@ -83,10 +83,10 @@ var tasks = {
             const list = [
                 path.join(__dirname, '**', '*.*'),
                 '.babelrc',
-                //'!./node_modules/**/*.*',
+                '!./node_modules/**/*.*',
                 '!./coverage/**/*.*',
                 '!./test/**/*.*',
-                '!./src/views/**/*.*',
+                '!./views/**/*.*',
                 '!./.git/**/*.*',
                 '!./.idea/**/*.*',
                 '!./README.md',

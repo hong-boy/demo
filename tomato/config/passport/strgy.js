@@ -2,7 +2,7 @@
 const passport = require('koa-passport');
 const lodash = require('lodash/object');
 const conf = require('../privs.js');
-const StoreUtil = require('.././util/Store');
+const StoreUtil = require('../../app/util/Store');
 const PREFIX_4_ROLE = 'koa:role';
 const MAXAGE_4_ROLE = require('../env.js').session.maxAge;
 

@@ -12,9 +12,9 @@ const send = require('koa-send');
 const lodash = require('lodash/object');
 const historyFallback = require('koa2-history-api-fallback');
 
-const conf = require('./../config/env');
+const conf = require('./config/env');
 const auth = require('./app/Auth.js');
-require('./../config/passport/strgy.js');
+require('./config/passport/strgy.js');
 const proxy = require('koa-router')();
 const router = require('./app/route/index');
 const logger = require('./app/util/Logger').logger('app.js');

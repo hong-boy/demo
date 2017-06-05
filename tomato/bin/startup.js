@@ -4,10 +4,10 @@
  * Module dependencies.
  */
 
-var app = require('../src/app');
+var app = require('../app');
 var http = require('http');
 var conf = require('../config/env.js');
-var logger = require('./util/Logger').logger('startup.js');
+var logger = require('../app/util/Logger').logger('startup.js');
 
 /**
  * Get port from environment and store in Express.
