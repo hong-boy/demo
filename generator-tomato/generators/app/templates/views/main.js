@@ -14,28 +14,6 @@ Vue.use(ElementUI);
 
 window.IOT = IOT;
 
-//router.beforeEach((to, from, next) => {
-//  let path = to.path;
-//  if (path === '/login' || path === '/404') {
-//    // 白名单
-//    next();
-//  } else if (path === '/logout') {
-//    // 若为登出
-//    IOT.removeUserInfo();
-//    next();
-//  } else if (IOT.auth(path)) {
-//    // 若用户已登录，且有权限访问path
-//    next();
-//  } else if (IOT.loadUserInfo()) {
-//    // 若用户已登录，则表明没有权限访问path
-//    console.error('没有权限!', path);
-//    next(false);
-//  } else {
-//    // 用户没有登录
-//    next('/login');
-//  }
-//});
-
 router.beforeEach(async (to, from, next) => {
     // 校验页面访问权限
     let path = to.path;
