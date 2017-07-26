@@ -1,0 +1,87 @@
+.uk-tooltip{
+  position:absolute;
+  padding:5px 10px;
+  border-radius:5px;
+  box-shadow:0px 0px 10px rgba(76, 76, 76, 0.95);
+  background:rgba(76, 76, 76, .95);
+  color:#fff;
+  font-size:14px;
+
+  &.arrow{
+    @arrowBorder:10px solid rgb(76, 76, 76);
+    &:before,
+    &:after{
+      content:'';
+      position:absolute;
+      border:7px solid transparent;
+    }
+    &.arrow-up{
+      &:before,
+      &:after{
+        border-bottom:@arrowBorder;
+      }
+      &:before{
+        top:-50%;
+        left:50%;
+        transform:translateX(-50%);
+        opacity:0.2;
+      }
+      &:after{
+        top:-55%;
+        left:50%;
+        transform:translateX(-50%);
+      }
+    }
+    &.arrow-down{
+      &:before,
+      &:after{
+        border-top:@arrowBorder;
+      }
+      &:before{
+        top:95%;
+        left:50%;
+        transform:translateX(-50%);
+        opacity:0.2;
+      }
+      &:after{
+        top:100%;
+        left:50%;
+        transform:translateX(-50%);
+      }
+    }
+    &.arrow-left{
+      &:before,
+      &:after{
+        border-right:@arrowBorder;
+      }
+      &:before{
+        top:50%;
+        left:-15px;
+        transform:translateY(-50%);
+        opacity:0.2;
+      }
+      &:after{
+        top:50%;
+        left:-15px;
+        transform:translateY(-50%);
+      }
+    }
+    &.arrow-right{
+      &:before,
+      &:after{
+        border-left:@arrowBorder;
+      }
+      &:before{
+        top:50%;
+        left:100%;
+        transform:translateY(-50%);
+        opacity:0.2;
+      }
+      &:after{
+        top:55%;
+        left:100%;
+        transform:translateY(-50%);
+      }
+    }
+  }
+}

@@ -6,7 +6,7 @@ let base = require('./base.conf');
  */
 module.exports = deepMerge({
   debug: true, // true-开发环境 false-生产环境
-  port: 3000,
+    port: 3001,
   env: 'development',
   dist: 'dist/dev',
   log4js: {

@@ -1,7 +1,7 @@
 'use strict';
 (function ($, undefined) {
-    var ui = $.fn.uikits = {};
-    ui.prototype = {
+    $.fn.uikits = {};
+    $.fn.uikits = {
         register: function (pluginName, fn) {
             if ($.fn.hasOwnProperty(pluginName)) {
                 throw 'Plugin Name ' + pluginName + ' is already existed!';

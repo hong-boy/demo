@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>Tooltip Demo</title>
+    <link rel="stylesheet" type="text/css" href="../uikits.core.css"/>
+    <link rel="stylesheet" type="text/css" href="./ui.tooltip.css"/>
+    <script type="text/javascript" src="../../depnd/jquery.1.11.min.js"></script>
+    <script type="text/javascript" src="../uikits.core.js"></script>
+    <script type="text/javascript" src="./ui.tooltip.js"></script>
+    <style>
+        .btn{
+            position:relative;
+            /*left: 50%;*/
+            /*top: 150px;*/
+            width:50%;
+        }
+        .section{
+            display:flex;
+            flex-direction:row;
+            align-items:center;
+            justify-content:space-around;
+        }
+    </style>
+</head>
+<body class="ui-kits">
+<section class="section">
+    <button class="btn" title="点击查询点击查询点击查询" tooltip-position="bottom">Bottom</button>
+    <button class="btn" title="点击查询点击查询点击查询" tooltip-position="top">Top</button>
+    <button class="btn" title="点击查询点击查询点击查询" tooltip-position="left">Left</button>
+    <button class="btn" title="点击查询点击查询点击查询" tooltip-position="right">Right</button>
+</section>
+</body>
+<script type="text/javascript">
+    $('.section').tooltip({
+        selector: '.btn',
+        arrow: true,
+        position: 'bottom'
+    })
+</script>
+</html>

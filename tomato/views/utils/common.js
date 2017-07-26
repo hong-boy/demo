@@ -79,6 +79,19 @@ let auth = async function (path) {
 };
 
 /**
+ * 页面权限校验
+ * （用于UI展示）
+ * @param pageUrl
+ * @returns {boolean}
+ */
+let auth4Page = function (pageUrl) {
+    let flag = false,
+        user = loadUserInfo() || {};
+    flag = lodash.includes([].concat(user.full, user.fuzzy), pageUrl);
+    return flag;
+};
+
+/**
  * 跳转至首页
  */
 let redirect2Home = function () {
@@ -109,6 +122,7 @@ export default {
   restoreSession,
   removeSession,
   auth,
+    auth4Page,
   redirect2Home,
   redirect2NotFound,
   signout,
