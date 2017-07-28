@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <title>Tooltip Demo</title>
     <link rel="stylesheet" type="text/css" href="../uikits.core.css"/>
-    <link rel="stylesheet" type="text/css" href="./ui.tooltip.css"/>
+    <link rel="stylesheet" type="text/css" href="./ui.popover.css"/>
     <script type="text/javascript" src="../../depnd/jquery-3.2.1.js"></script>
     <script type="text/javascript" src="../uikits.core.js"></script>
-    <script type="text/javascript" src="./ui.tooltip.js"></script>
+    <script type="text/javascript" src="./ui.popover.js"></script>
     <style>
         .btn{
             position:relative;
@@ -31,27 +31,44 @@
 <body class="ui-kits">
 <section class="section">
     <div class="box">
-        <button id="test" class="btn" title="1233231" tooltip-position="bottom">Bottom</button>
+        <button id="test" class="btn" title="1233231" popover-position="bottom">Bottom</button>
     </div>
     <div class="box">
-        <button class="btn" title="123" tooltip-position="top">Top</button>
+        <button class="btn" title="123" popover-position="top">Top</button>
     </div>
     <div class="box">
-        <button class="btn" title="点击查询点击查询点击查询点击查询点击查询点击查询" tooltip-position="left">Left</button>
+        <button class="btn" popover-position="left">Left</button>
     </div>
     <div class="box">
-        <button class="btn" title="点击查询点击查询点击查询点击查询点击查询点击查询" tooltip-flip="true" tooltip-position="right">Right</button>
+        <button class="btn" popover-flip="true" popover-position="right">Right</button>
     </div>
 </section>
 </body>
 <script type="text/javascript">
-    $('.section').tooltip({
-//        selector: '.btn',
-        selector: '[title]',
-        arrow: false,
+    $('.section').popover({
+        selector: '.btn',
         flip: false,
         trigger: 'click',
-        position: 'bottom'
+        position: 'bottom',
+        header: 'Header',
+        buttons: [{
+            text: '确定',
+            clazz: 'btn-confirm',
+            click: function (e) {
+                console.log('confirm...');
+                return false;
+            }
+        }, {
+            text: '取消',
+            clazz: 'btn-cancel',
+            click: function (e) {
+                console.log('cancel...');
+                return false;
+            }
+        }],
+        content: function ($target) {
+            return 'content...' + $target.text();
+        }
     });
 
     //    $('#test').tooltip({

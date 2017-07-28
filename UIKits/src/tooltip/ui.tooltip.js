@@ -91,7 +91,7 @@
          * 获取待显示的文本信息
          * @param $target
          */
-        getTooltipTitle: function ($target) {
+        getPopoverContent: function ($target) {
             var tooltipTitle = $target.attr('tooltip-title') || '';
             if (!tooltipTitle.length) {
                 tooltipTitle = $target.attr('title') || '';
@@ -286,7 +286,7 @@
             var $container = util.getContainer(option, $target);
             var $tooltip = $(option.template).css('visibility', 'hidden');
             var $content = $('.content', $tooltip);
-            var tooltipTitle = util.getTooltipTitle($target);
+            var tooltipTitle = util.getPopoverContent($target);
             $content.text(tooltipTitle);
 
             $tooltip.appendTo($container);
