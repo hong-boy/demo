@@ -2,10 +2,12 @@
   position:absolute;
   padding:5px 10px;
   border-radius:5px;
+  max-width:300px;
   box-shadow:0px 0px 10px rgba(76, 76, 76, 0.95);
   background:rgba(76, 76, 76, .95);
   color:#fff;
   font-size:14px;
+  text-align:left;
 
   &.arrow{
     @arrowBorder:10px solid rgb(76, 76, 76);
@@ -21,13 +23,13 @@
         border-bottom:@arrowBorder;
       }
       &:before{
-        top:-50%;
+        top:-15px;
         left:50%;
         transform:translateX(-50%);
         opacity:0.2;
       }
       &:after{
-        top:-55%;
+        top:-16px;
         left:50%;
         transform:translateX(-50%);
       }
@@ -78,7 +80,7 @@
         opacity:0.2;
       }
       &:after{
-        top:55%;
+        top:50%;
         left:100%;
         transform:translateY(-50%);
       }

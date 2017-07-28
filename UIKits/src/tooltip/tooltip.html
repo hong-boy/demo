@@ -20,22 +20,44 @@
             flex-direction:row;
             align-items:center;
             justify-content:space-around;
+            /*overflow: hidden;*/
+        }
+        .section .box{
+            flex-basis:25%;
+            text-align:right;
         }
     </style>
 </head>
 <body class="ui-kits">
 <section class="section">
-    <button class="btn" title="点击查询点击查询点击查询" tooltip-position="bottom">Bottom</button>
-    <button class="btn" title="点击查询点击查询点击查询" tooltip-position="top">Top</button>
-    <button class="btn" title="点击查询点击查询点击查询" tooltip-position="left">Left</button>
-    <button class="btn" title="点击查询点击查询点击查询" tooltip-position="right">Right</button>
+    <div class="box">
+        <button id="test" class="btn" title="1233231" tooltip-position="bottom">Bottom</button>
+    </div>
+    <div class="box">
+        <button class="btn" title="123" tooltip-position="top">Top</button>
+    </div>
+    <div class="box">
+        <button class="btn" title="点击查询点击查询点击查询点击查询点击查询点击查询" tooltip-position="left">Left</button>
+    </div>
+    <div class="box">
+        <button class="btn" title="点击查询点击查询点击查询点击查询点击查询点击查询" tooltip-flip="true" tooltip-position="right">Right</button>
+    </div>
 </section>
 </body>
 <script type="text/javascript">
     $('.section').tooltip({
-        selector: '.btn',
-        arrow: true,
+//        selector: '.btn',
+        selector: '[title]',
+        arrow: false,
+        flip: false,
+        trigger: 'click',
         position: 'bottom'
-    })
+    });
+
+    //    $('#test').tooltip({
+    //        arrow: true,
+    //        trigger: 'click',
+    //        position: 'bottom'
+    //    })
 </script>
 </html>
