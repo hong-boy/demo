@@ -13,9 +13,9 @@
      */
     var DEFAULTS = {
         template: '<div class="uk-popover arrow"><header class="popover-header"></header><section class="content"></section><footer class="popover-footer"></footer></div>',
-        content: function ($target) {
+        content: function ($target) { // 要展示的内容，必须是一个function函数，该函数可以返回jQuery对象或者字符串，若返回结果是字符串则不能包含html标签
             return '';
-        }, // 要展示的内容，必须是一个function函数，该函数可以返回jQuery对象或者字符串，若返回结果是字符串则不能包含html标签
+        },
         customClass: null, // 自定义类名 若不为空，则将添加到div.uk-popover元素上
         header: null, // 弹出框标题，若为空则不会渲染header.popover-header元素
         buttons: null, // 自定义操作，若不为空，则将展示到footer.popover-footer元素内；形如:[{text:'按钮名称', clazz:'自定义类名', click:Function}]；若为空则不渲染footer元素
