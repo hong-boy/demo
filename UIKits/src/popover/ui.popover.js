@@ -16,13 +16,17 @@
         content: function ($target) { // 要展示的内容，必须是一个function函数，该函数可以返回jQuery对象或者字符串，若返回结果是字符串则不能包含html标签
             return '';
         },
-        customClass: null, // 自定义类名 若不为空，则将添加到div.uk-popover元素上
+        customClass: 'theme-light', // 自定义类名 若不为空，则将添加到div.uk-popover元素上
         header: null, // 弹出框标题，若为空则不会渲染header.popover-header元素
-        buttons: null, // 自定义操作，若不为空，则将展示到footer.popover-footer元素内；形如:[{text:'按钮名称', clazz:'自定义类名', click:Function}]；若为空则不渲染footer元素
+        // 自定义操作，若不为空，则将展示到footer.popover-footer元素内；
+        // 形如:[{text:'按钮名称', clazz:'自定义类名', click:Function}]；(click句柄返回true，表示关闭弹出框)
+        // 若为空则不渲染footer元素
+        buttons: null,
         flip: false, // 当弹出框超出可视窗口时是否反转显示
-        trigger: 'mouseover', // 触发方式，支持：mouseover、mouseenter、click
+        trigger: 'mouseover', // 触发方式，支持：mouseover、mouseenter、click、mousedown
         position: 'bottom', // 位置 bottom-底部（相对于目标节点）top-顶部 left-左侧 right-右侧
         selector: null, // 目标节点选择器; 若为空，则默认使用当前this节点作为目标节点
+        size: [], // 弹出框尺寸 [width, height]
     };
 
     var util = {
@@ -60,6 +64,11 @@
                 case 'mouseenter':
                 {
                     detachedEvent = 'mouseleave';
+                    break;
+                }
+                case 'mousedown':
+                {
+                    detachedEvent = 'mouseup';
                     break;
                 }
                 case 'click':
@@ -112,6 +121,8 @@
          * popover-arrow: option.arrow
          * popover-position: option.position
          * popover-header: option.header
+         * popover-width: option.size.width
+         * popover-height: option.size.height
          * @param $target
          * @param attr
          */
@@ -126,6 +137,8 @@
                 }
                 case 'popover-header':
                 case 'popover-position':
+                case 'popover-width':
+                case 'popover-height':
                 {
                     break;
                 }
@@ -265,13 +278,13 @@
             return flippedPos;
         },
         /**
-         * 更新目标节点tooltip-position
+         * 更新目标节点popover-position
          * @param $target
          * @param position
          */
-        updateAttrTooltipPosition: function ($target, position) {
+        updateAttrPopoverPosition: function ($target, position) {
             var original = $target.attr('popover-position');
-            $target.attr('tooltip-original-position', original);
+            $target.attr('popover-original-position', original);
             $target.attr('popover-position', position);
         },
     };
@@ -293,9 +306,10 @@
             ui.renderPopoverFooter($target, $popover, option);
 
             $popover.appendTo($container);
+            ui.renderPopoverSize($popover, $target, option);
             ui.calcPosition(option, $container, $target, $popover);
 
-            $popover.hide().css('visibility', '');
+            $popover.hide().css('visibility', '').addClass(option.customClass);
             $target.data('tag4popover', $popover);
             $target.data('tag4container', $container);
             $target.data('tag4option', option);
@@ -306,7 +320,7 @@
                 var option = $target.data('tag4option');
                 util.nextTick(function () {
                     ui.calcPosition(option, $container, $target, $popover);
-                    //ui.calcPosition4Flip($target, $tooltip, $container, option);
+                    ui.calcPosition4Flip($target, $popover, $container, option);
                 });
             });
         },
@@ -354,10 +368,16 @@
             var buttons = option.buttons;
             if ($.isArray(buttons) && buttons.length) {
                 $.each(buttons, function (i, btn) {
-                    $('<button class="btn"></button>')
+                    $('<span class="btn btn-small"></span>')
                         .addClass(btn.clazz)
                         .text(btn.text)
-                        .click(btn.click)
+                        .click(function (e) {
+                            var flag = btn.click.call(null, e);
+                            if (flag) {
+                                ui.hide($target);
+                            }
+                            return false;
+                        })
                         .appendTo($popoverFooter);
                 });
             } else {
@@ -365,13 +385,25 @@
             }
         },
         /**
-         * 设置tooltip框的宽和高，并作为初始值
-         * @param $tooltip
+         * 设置弹出框的宽和高，并作为初始值
+         * （优先级：popover-width > size.width > $popover.outerWidth()）
+         * @param $popover
+         * @param $target
+         * @param option
          */
-        renderTooltipSize: function ($tooltip) {
-            $tooltip.css({
-                height: $tooltip.outerHeight(),
-                width: $tooltip.outerWidth(),
+        renderPopoverSize: function ($popover, $target, option) {
+            var size = [].concat(option.size);
+            var width = util.getAttrOption($target, 'popover-width');
+            var height = util.getAttrOption($target, 'popover-height');
+            if (width) {
+                size[0] = width;
+            }
+            if (height) {
+                size[1] = height;
+            }
+            $popover.css({
+                height: size[1] ? size[1] : $popover.outerHeight(),
+                width: size[0] ? size[0] : $popover.outerWidth(),
             });
         },
         /**
@@ -429,12 +461,12 @@
          * 计算popover框反转显示的位置
          * （若反转之后仍然超出可视区域，则不再处理）
          * @param $target
-         * @param $tooltip
+         * @param $popover
          * @param $container
          * @param option
          */
-        calcPosition4Flip: function ($target, $tooltip, $container, option) {
-            var flip = util.getAttrOption($target, 'tooltip-flip');
+        calcPosition4Flip: function ($target, $popover, $container, option) {
+            var flip = util.getAttrOption($target, 'popover-flip');
             if (flip === undefined) {
                 flip = option.flip; // 继承option.flip
             }
@@ -442,7 +474,7 @@
                 // 若不开启flip
                 return;
             }
-            var rect = $tooltip.get(0).getBoundingClientRect();
+            var rect = $popover.get(0).getBoundingClientRect();
             var viewport = {
                 left: 0,
                 top: 0,
@@ -457,8 +489,8 @@
             var position = util.getAttrOption($target, 'popover-position');
             position = position === undefined ? option.position : position;
             var flippedPosition = util.getFlippedPosition(position);
-            util.updateAttrTooltipPosition($target, flippedPosition);
-            ui.calcPosition(option, $container, $target, $tooltip);
+            util.updateAttrPopoverPosition($target, flippedPosition);
+            ui.calcPosition(option, $container, $target, $popover);
         }
     };
 

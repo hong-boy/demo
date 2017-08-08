@@ -9,11 +9,12 @@
     <script type="text/javascript" src="../uikits.core.js"></script>
     <script type="text/javascript" src="./ui.popover.js"></script>
     <style>
-        .btn{
+        .button{
             position:relative;
             /*left: 50%;*/
             /*top: 150px;*/
-            width:50%;
+            /*width:50%;*/
+            min-width:200px;
         }
         .section{
             display:flex;
@@ -31,26 +32,30 @@
 <body class="ui-kits">
 <section class="section">
     <div class="box">
-        <button id="test" class="btn" title="1233231" popover-position="bottom">Bottom</button>
+        <button id="test" class="btn button" title="1233231" popover-position="bottom" popover-header="test">Bottom
+        </button>
     </div>
     <div class="box">
-        <button class="btn" title="123" popover-position="top">Top</button>
+        <button class="btn button" title="123" popover-position="top">Top</button>
     </div>
     <div class="box">
-        <button class="btn" popover-position="left">Left</button>
+        <button class="btn button" popover-position="left">Left</button>
     </div>
     <div class="box">
-        <button class="btn" popover-flip="true" popover-position="right">Right</button>
+        <button class="btn button" popover-flip="true" popover-position="right">Right</button>
     </div>
 </section>
 </body>
 <script type="text/javascript">
     $('.section').popover({
+//        customClass: 'theme-dark',
         selector: '.btn',
-        flip: false,
+        flip: true,
         trigger: 'click',
+//        trigger: 'mousedown',
         position: 'bottom',
         header: 'Header',
+//        size: ['400px', '400px'],
         buttons: [{
             text: '确定',
             clazz: 'btn-confirm',
@@ -60,21 +65,42 @@
             }
         }, {
             text: '取消',
-            clazz: 'btn-cancel',
+            clazz: 'btn-empty',
             click: function (e) {
                 console.log('cancel...');
-                return false;
+                return true;
             }
         }],
         content: function ($target) {
-            return 'content...' + $target.text();
+            return '确认要删除吗？' + $target.text();
         }
     });
 
-    //    $('#test').tooltip({
-    //        arrow: true,
-    //        trigger: 'click',
-    //        position: 'bottom'
-    //    })
+    //    $('#test').popover({
+    //        flip: false,
+    //        trigger: 'mousedown',
+    //        position: 'bottom',
+    //        buttons: [{
+    //            text: '确定',
+    //            clazz: 'btn-confirm',
+    //            click: function (e) {
+    //                console.log('confirm...');
+    //                return false;
+    //            }
+    //        }, {
+    //            text: '取消',
+    //            clazz: 'btn-empty',
+    //            click: function (e) {
+    //                console.log('cancel...');
+    //                return true;
+    //            }
+    //        }],
+    //        content: function ($target) {
+    //            return '确认要删除吗？' + $target.text();
+    //        }
+    //    });
+
+
+
 </script>
 </html>

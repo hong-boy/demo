@@ -33,3 +33,16 @@ Promise.all(asyncPromise1, asyncPromise2)
     .catch(function (e) {
         console.error('Promise.all ', e);
     });
+
+/********************Promise.catch**********************/
+var catchPromise = new Promise(function (resolve, reject) {
+    setTimeout(function () {
+        reject('catchPromise');
+    }, 1500);
+});
+
+catchPromise.then(function (ret) {
+    console.log(ret);
+}).catch(function (err) {
+    console.error('catchPromise catch: ', err);
+});
