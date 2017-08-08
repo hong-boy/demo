@@ -269,7 +269,7 @@
          * @param $target
          * @param position
          */
-        updateAttrTooltipPosition: function ($target, position) {
+        updateAttrPopoverPosition: function ($target, position) {
             var original = $target.attr('tooltip-position');
             $target.attr('tooltip-original-position', original);
             $target.attr('tooltip-position', position);
@@ -438,7 +438,7 @@
             var position = util.getAttrOption($target, 'tooltip-position');
             position = position === undefined ? option.position : position;
             var flippedPosition = util.getFlippedPosition(position);
-            util.updateAttrTooltipPosition($target, flippedPosition);
+            util.updateAttrPopoverPosition($target, flippedPosition);
             ui.calcPosition(option, $container, $target, $tooltip);
         }
     };
