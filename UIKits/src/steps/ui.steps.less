@@ -1,0 +1,99 @@
+@import url('../uikits.mixin.less');
+.uk-steps {
+  position: relative;
+  @color4StatusWait:#bfcbd9;
+  @color4StatusProgress:#bfcbd9;
+  @color4StatusError:#ff4949;
+  @color4StatusSuccess:#13ce66;
+  .steps-header {
+    @stepIconSize: 30px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    .step-item {
+      position: relative;
+      min-width: 100px;
+      width: 100px; // 步骤之间的间距
+      .flexlayout(inline-flex, column, flex-start, space-between);
+      // 隐藏最后一个元素的step-line
+      &:last-child {
+        width: auto !important;
+        .step-line {
+          display: none;
+        }
+      }
+      // wait
+      &.wait {
+        .step-icon {
+          background: #fff;
+          border: 2px solid #ccc;
+          border-color:@color4StatusWait;
+          color:@color4StatusWait;
+        }
+      }
+      // progress
+      &.progress {
+        .step-icon {
+          background:@color4StatusProgress;
+          border: 2px solid @color4StatusProgress;
+          color:#fff;
+        }
+      }
+      // error
+      &.error {
+
+      }
+      // success
+      &.success {
+        .step-icon {
+          background:@color4StatusSuccess;
+          border: 2px solid @color4StatusSuccess;
+          color:#fff;
+        }
+        .step-line {
+          .progressbar {
+            width: 100%;
+            background-color: @color4StatusSuccess;
+          }
+        }
+        .step-label,
+        .step-desc {
+          color:@color4StatusSuccess;
+        }
+      }
+    }
+    .step-icon {
+      display: block;
+      border-radius: 50%;
+      width: @stepIconSize;
+      height: @stepIconSize;
+      text-align: center;
+      > span {
+        vertical-align: sub;
+      }
+    }
+    .step-line {
+      position: absolute;
+      display: block;
+      width: ~'calc(100% - @{stepIconSize})';
+      height: 2px;
+      top: @stepIconSize/2;
+      left: @stepIconSize;
+      background:@color4StatusWait;
+      .progressbar {
+        position: absolute;
+        width: 0;
+        height: 100%;
+      }
+    }
+    .step-label {
+      font-weight: 700;
+    }
+    .step-desc {
+      font-size: 12px;
+      color: #666;
+    }
+  }
+  .item-section {
+    .flexlayout(flex, column, flex-start, center);
+  }
+}

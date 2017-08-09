@@ -1,0 +1,11 @@
+@primaryColor: #00B8FE;
+@secondaryColor: lighten(@primaryColor, 20%);
+
+// 弹性布局
+.flexlayout(@flex, @direction, @alignItems, @justifyContent, @wrap:nowrap){
+  display: @flex;
+  flex-direction: @direction;
+  align-items: @alignItems;
+  justify-content: @justifyContent;
+  flex-wrap: @wrap;
+}
