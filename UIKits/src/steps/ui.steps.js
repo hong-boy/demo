@@ -9,281 +9,18 @@
         current: 0, // 当前所在步骤 对应option.steps数组的索引
         space: '100px', // 步骤之间的间距
         steps: [{
-            label: '步骤一',
-            desc: 'some desc...',
-            icon: null,
-            render: '<p>This is step-1</p>'
-        }],
-        onFinished: null, // stepsbar插件初始化完成后的回调函数
-        onNext: null, // 下一步回调
-        onPrev: null, // 上一步回调
+            label: '步骤一', // {required: false, type:String, desc:'步骤名称'}
+            desc: 'some desc...', // {required: false, type:String, desc:'描述'}
+            icon: null, // {required: false, type:String, desc:'自定义icon'}
+            render: '<p>This is step-1</p>' // {required:true, type:jQuery|Function|String}
+        }]
     };
 
     var ENUM_STEP_STATUS = {
-        1: 'wait',
-        2: 'progress',
-        3: 'success',
-        4: 'error'
-    };
-
-    var util = {
-        nextTick: function (fn) {
-            if (typeof window.requestAnimationFrame === 'function') {
-                requestAnimationFrame(fn);
-            } else {
-                setTimeout(fn, 1);
-            }
-        },
-        /**
-         * 判断是否是委托事件绑定
-         * @param option
-         * @returns {boolean}
-         */
-        isDelegatedMode: function (option) {
-            return !!option.selector;
-        },
-        /**
-         * 为事件包裹命名空间
-         * @param eventName
-         * @returns {string}
-         */
-        wrapEventNamespace: function (eventName) {
-            return [eventName, '.uk'].join('');
-        },
-        /**
-         * 根据传入的option.trigger事件，获取对立事件（用于关闭tooltip框）
-         * @param option
-         */
-        getDetachedEventName: function (option) {
-            var detachedEvent = null;
-            option.trigger = option.trigger || 'mouseover';
-            switch (option.trigger) {
-                case 'mouseenter':
-                {
-                    detachedEvent = 'mouseleave';
-                    break;
-                }
-                case 'mousedown':
-                {
-                    detachedEvent = 'mouseup';
-                    break;
-                }
-                case 'click':
-                {
-                    detachedEvent = 'click';
-                    break;
-                }
-                case 'mouseover':
-                default:
-                {
-                    option.trigger = 'mouseover';
-                    detachedEvent = 'mouseout';
-                    break;
-                }
-            }
-            return this.wrapEventNamespace(detachedEvent);
-        },
-        /**
-         * 获取container容器（用于存放tooltip框）
-         * @param option
-         * @param $target 目标节点
-         */
-        getContainer: function (option, $target) {
-            var $parent = $target.parent();
-            if ($parent.css('position') === 'static') {
-                $parent.css('position', 'relative');
-            }
-            return $parent;
-        },
-        /**
-         * 获取待显示的内容
-         * @param $target
-         * @param option
-         */
-        getPopoverContent: function ($target, option) {
-            var fn = option.content;
-            if (!$.isFunction(fn)) {
-                throw 'Illegal arguments: option.content should be a function'
-            }
-            var content = fn.call(null, $target);
-            if (!(content instanceof jQuery || typeof content === 'string')) {
-                throw 'option.content should return a string or jQuery object'
-            }
-            return content;
-        },
-        /**
-         * 获取目标节点上的属性配置
-         * 支持的属性：
-         * popover-flip: option.flip
-         * popover-arrow: option.arrow
-         * popover-position: option.position
-         * popover-header: option.header
-         * popover-width: option.size.width
-         * popover-height: option.size.height
-         * @param $target
-         * @param attr
-         */
-        getAttrOption: function ($target, attr) {
-            var attrValue = $target.attr(attr);
-            switch (attr) {
-                case 'popover-flip':
-                case 'popover-arrow':
-                {
-                    attrValue = (attrValue === undefined ? undefined : (attrValue === 'true'));
-                    break;
-                }
-                case 'popover-header':
-                case 'popover-position':
-                case 'popover-width':
-                case 'popover-height':
-                {
-                    break;
-                }
-                default:
-                {
-                    attrValue = undefined;
-                }
-            }
-            return attrValue;
-        },
-        /**
-         * 绑定委托事件
-         * @param $dom 被委托节点
-         * @param option
-         */
-        bindDelegatedEvent: function ($dom, option) {
-            var detachedEventName = util.getDetachedEventName(option);
-            var eventName = util.wrapEventNamespace(option.trigger);
-            if (option.trigger !== 'click') {
-                // 处理option.trigger!=click情形
-                $dom.off(eventName, option.selector)
-                    .on(eventName, option.selector, function (e) {
-                        // 初始化tooltip框
-                        var $target = $(this);
-                        ui.depose($target);
-                        ui.render(option, $target);
-                        ui.show($target);
-                    });
-
-                $dom.off(detachedEventName, option.selector)
-                    .on(detachedEventName, option.selector, function (e) {
-                        ui.hide($(this));
-                    });
-                return;
-            }
-
-            // 处理option.trigger==click情形
-            $dom.off(eventName, option.selector)
-                .on(eventName, option.selector, function (e) {
-                    // 初始化popover框
-                    var $target = $(this);
-                    var $popover = $target.data('tag4popover');
-                    if ($popover && $popover.is(':visible')) {
-                        // 正在显示
-                        ui.hide($target);
-                        return;
-                    }
-                    // 未显示或未初始化，则创建新的popover
-                    ui.depose($target);
-                    ui.render(option, $target);
-                    ui.show($target);
-                });
-        },
-        /**
-         * 为目标节点绑定事件
-         * @param $target 目标节点
-         * @param option
-         */
-        bindNormalEvent: function ($target, option) {
-            var detachedEventName = util.getDetachedEventName(option);
-            var eventName = util.wrapEventNamespace(option.trigger);
-            if (option.trigger !== 'click') {
-                $target.unbind(eventName).bind(eventName, function (e) {
-                    var $target = $(this);
-                    ui.depose($target);
-                    ui.render(option, $target);
-                    ui.show($target);
-                    return false;
-                });
-
-                $target.unbind(detachedEventName).bind(detachedEventName, function (e) {
-                    ui.hide($(this));
-                    return false;
-                });
-                return;
-            }
-            // 处理option.trigger==click情形
-            $target.unbind(eventName).bind(eventName, function (e) {
-                // 初始化popover框
-                var $target = $(this);
-                var $popover = $target.data('tag4popover');
-                if ($popover && $popover.is(':visible')) {
-                    // 正在显示
-                    ui.hide($target);
-                    return;
-                }
-                // 未显示或未初始化，则创建新的popover
-                ui.depose($target);
-                ui.render(option, $target);
-                ui.show($target);
-            });
-        },
-        /**
-         * 判断可视窗口是否包含矩形
-         * @param rect
-         * @param viewport
-         */
-        judgeViewportContainsRect: function (rect, viewport) {
-            return viewport.left <= rect.left &&
-                viewport.top <= rect.top &&
-                viewport.right >= rect.right &&
-                viewport.bottom >= rect.bottom;
-        },
-        /**
-         * 获取反转后的方向
-         * @param{string} position
-         */
-        getFlippedPosition: function (position) {
-            var flippedPos = null;
-            switch (position) {
-                case 'top':
-                {
-                    flippedPos = 'bottom';
-                    break;
-                }
-                case 'bottom':
-                {
-                    flippedPos = 'top';
-                    break;
-                }
-                case 'left':
-                {
-                    flippedPos = 'right';
-                    break;
-                }
-                case 'right':
-                {
-                    flippedPos = 'left';
-                    break;
-                }
-                default:
-                {
-                    flippedPos = 'bottom';
-                    break;
-                }
-            }
-            return flippedPos;
-        },
-        /**
-         * 更新目标节点popover-position
-         * @param $target
-         * @param position
-         */
-        updateAttrPopoverPosition: function ($target, position) {
-            var original = $target.attr('popover-position');
-            $target.attr('popover-original-position', original);
-            $target.attr('popover-position', position);
-        },
+        1: 'wait', // 等待
+        2: 'progress', // 处理中
+        3: 'success', // 成功
+        4: 'error' // 出错
     };
 
     var ui = {
@@ -293,23 +30,49 @@
             var $stepsContent = $('.content', $steps);
             ui.renderStepsHeader($stepsHeader, option);
             ui.renderStepsContent($stepsContent, option.current, option);
-            $steps.appendTo($container);
+            $steps.addClass(option.direction).appendTo($container);
             return $steps;
         },
         show: function($steps){
             $steps.show();
         },
+        /**
+         * 绘制step-content
+         * （初始化）
+         * @param $stepContent
+         * @param step
+         */
         renderStepsContent: function($stepContent, current, option){
             var step = option.steps[current];
+            if(!step){
+                return;
+            }
             var $original = $stepContent.find('.step-page');
             if($original.length){
                 $original.fadeOut(function(){
+                    $original.remove();
                     ui.renderStepsPage($stepContent, step);
                 });
             }else {
                 ui.renderStepsPage($stepContent, step);
             }
         },
+        /**
+         * 切换step-content视图
+         * （更新）
+         * @param $stepContent
+         * @param option
+         * @param current
+         */
+        refreshStepsContent: function($stepContent, option, current){
+            ui.renderStepsContent($stepContent, current, option);
+        },
+        /**
+         * 绘制step-page
+         * （初始化）
+         * @param $stepContent
+         * @param step
+         */
         renderStepsPage: function($stepContent, step){
             var $stepPage = $('<div class="step-page"></div>').hide();
             var page = $.isFunction(step.render) ? step.render.call(null, step) : step.render;
@@ -317,6 +80,7 @@
         },
         /**
          * 绘制header
+         * （初始化）
          * @param $stepsHeader
          * @param option
          */
@@ -327,7 +91,30 @@
                     ui.renderStepItem($stepsHeader, step, i + 1, option)
                 );
             });
-
+        },
+        /**
+         * 刷新header样式
+         * (更新)
+         * @param $stepsHeader
+         * @param option
+         */
+        refreshStepsHeader: function($stepsHeader, option){
+            var current = option.current;
+            var $current = $stepsHeader.find('> .step-item:eq('+(current)+')');
+            // 当前步骤前面的步骤项
+            $stepsHeader.find('> .step-item:lt('+(current)+')')
+                .each(function(){
+                    ui.updateStatus4StepItem($(this), 3);
+                });
+            // 当前步骤后面的步骤项
+            $stepsHeader.find('> .step-item:gt('+(current)+')')
+                .each(function(){
+                    ui.updateStatus4StepItem($(this), 1);
+                });
+            // 当前步骤
+            ui.updateStatus4StepItem($current, 2);
+            // 更新前一个step-item的progressbar
+            ui.updateStatus4Progressbar($current.prev(), $stepsHeader, option.direction);
         },
         /**
          * 绘制步骤节点
@@ -375,7 +162,7 @@
             if(option.current + 1 > index){
                 // 将被跳过的步骤置为：success
                 ui.updateStatus4StepItem($stepItem, 3);
-                ui.updateStatus4Progressbar($stepItem, $stepsHeader);
+                ui.updateStatus4Progressbar($stepItem, $stepsHeader, option.direction);
             }else if(option.current + 1 === index){
                 // 将当前步骤置为：progress
                 ui.updateStatus4StepItem($stepItem, 2);
@@ -399,11 +186,13 @@
          * （同时也需要更新前一个元素的progressbar宽度）
          * @param $stepItem
          * @param $stepsHeader
+         * @param direction
          */
-        updateStatus4Progressbar: function($stepItem, $stepsHeader){
-            $stepItem.find('.progressbar').css('width', '50%');
-            $stepsHeader.find('.success').each(function(){
-                $(this).find('.progressbar').css('width', '');
+        updateStatus4Progressbar: function($stepItem, $stepsHeader, direction){
+            var prop = direction === 'vertical' ? 'height' : 'width';
+            $stepItem.find('.progressbar').css(prop, '50%');
+            $stepsHeader.find('.success').not($stepItem).each(function(){
+                $(this).find('.progressbar').css(prop, '');
             });
         }
     };
@@ -412,17 +201,37 @@
         this._dom = $dom;
         this._option = option;
         this._current = option.current;
+        this._length = option.steps.length;
     }
     Stepsbar.prototype = {
         constructor: Stepsbar,
         next: function(){
-
+            if(this.isLastStep()){
+                console.warn('Steps done!');
+                return;
+            }
+            this._current ++;
         },
         prev: function(){
-
+            if(this.isFirstStep()){
+                console.warn('First step!');
+                return;
+            }
+            this._current --;
         },
-        isCompleted: function(){
-
+        /**
+         * 判断当前步骤是否是最后一步
+         * @returns {boolean}
+         */
+        isLastStep: function(){
+            return !(this._current < this._length);
+        },
+        /**
+         * 判断当前步骤是否是第一步
+         * @returns {boolean}
+         */
+        isFirstStep: function(){
+            return !(this._current > 0);
         },
     };
 
@@ -434,10 +243,29 @@
             if(!$.isArray(steps) || !steps.length || !steps.length > 1){
                 throw Error('Illegal arguments: options.steps should be an non-empty array and consist of two items at least.');
             }
-            option.current = Math.min(option.current, option.steps.length - 1);
+            var length = steps.length;
+            option.current = Math.min(option.current, length - 1);
             var $steps = ui.render($dom, option);
             ui.show($steps);
-            return new Stepsbar($dom, option);
+            var inst = new Stepsbar($dom, option);
+            // 监听option.current
+            Object.defineProperty(inst, '_current', {
+                get: function(){
+                    return option.current;
+                },
+                set: function(newVal){
+                    newVal = newVal < 0 ? 0 : newVal;
+                    newVal = newVal < length ? newVal : length;
+                    if(this._current !== newVal){
+                        option.current = newVal;
+                        // 更新steps-header|content
+                        ui.refreshStepsHeader($steps.find('.steps-header'), option);
+                        ui.refreshStepsContent($steps.find('.content'), option, newVal);
+                    }
+                    return newVal;
+                }
+            });
+            return inst;
         }
     };
 

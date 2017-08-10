@@ -5,15 +5,12 @@
   @color4StatusProgress:#bfcbd9;
   @color4StatusError:#ff4949;
   @color4StatusSuccess:#13ce66;
+  @stepIconSize: 30px;
+  @stepSpace: 100px; // 步骤之间的间距
   .steps-header {
-    @stepIconSize: 30px;
-    margin-bottom: 20px;
     font-size: 14px;
     .step-item {
       position: relative;
-      min-width: 100px;
-      width: 100px; // 步骤之间的间距
-      .flexlayout(inline-flex, column, flex-start, space-between);
       // 隐藏最后一个元素的step-line
       &:last-child {
         width: auto !important;
@@ -40,7 +37,26 @@
       }
       // error
       &.error {
-
+        .step-icon {
+          background:@color4StatusError;
+          border: 2px solid @color4StatusError;
+          color:#fff;
+          > span {
+            display: none;
+          }
+          &:after {
+            content:'X';
+            display: inline-block;
+            height: 100%;
+            width: 100%;
+            text-align: center;
+            vertical-align: sub;
+          }
+        }
+        .step-label,
+        .step-desc {
+          color:@color4StatusError;
+        }
       }
       // success
       &.success {
@@ -51,7 +67,6 @@
         }
         .step-line {
           .progressbar {
-            width: 100%;
             background-color: @color4StatusSuccess;
           }
         }
@@ -74,15 +89,11 @@
     .step-line {
       position: absolute;
       display: block;
-      width: ~'calc(100% - @{stepIconSize})';
-      height: 2px;
-      top: @stepIconSize/2;
-      left: @stepIconSize;
       background:@color4StatusWait;
       .progressbar {
         position: absolute;
-        width: 0;
-        height: 100%;
+        transition: all 0.2s ease;
+        transition-delay: 150ms;
       }
     }
     .step-label {
@@ -93,7 +104,92 @@
       color: #666;
     }
   }
-  .item-section {
-    .flexlayout(flex, column, flex-start, center);
+  > .content {
+    flex-grow: 1;
+  }
+  &.horizonal {
+    .steps-header {
+      margin-bottom: 20px;
+      .step-item {
+        min-width: 100px;
+        width: @stepSpace; // 步骤之间的间距
+        .flexlayout(inline-flex, column, flex-start, space-between);
+        // error
+        &.error {
+          .step-line {
+            .progressbar {
+              width: 0;
+            }
+          }
+        }
+        // success
+        &.success {
+          .step-line {
+            .progressbar {
+              width: 100%;
+            }
+          }
+        }
+      }
+      .step-line {
+        width: ~'calc(100% - @{stepIconSize})';
+        height: 2px;
+        top: @stepIconSize/2;
+        left: @stepIconSize;
+        .progressbar {
+          width: 0;
+          height: 100%;
+        }
+      }
+    }
+    .item-section {
+      .flexlayout(flex, column, flex-start, center);
+    }
+  }
+  &.vertical {
+    @margin4Header: 10px;
+    .flexlayout(flex, row, flex-start, space-between);
+    .steps-header {
+      margin-right: 20px;
+      .step-item {
+        min-height: 100px;
+        height: @stepSpace;
+        width: 2px;
+        // error
+        &.error {
+          .step-line {
+            .progressbar {
+              height: 0;
+            }
+          }
+        }
+        // success
+        &.success {
+          .step-line {
+            .progressbar {
+              height: 100%;
+            }
+          }
+        }
+      }
+      .item-header {
+        display: inline-block;
+        margin-right: @margin4Header;
+        height: 100%;
+      }
+      .step-line {
+        height: ~'calc(100% - @{stepIconSize})';
+        width: 2px;
+        top: @stepIconSize;
+        left: @stepIconSize / 2 - 1px;
+        .progressbar {
+          width: 100%;
+        }
+      }
+    }
+    .item-section {
+      width: ~'calc(100% - @{stepSpace} - @{margin4Header})';
+      .flexlayout(inline-flex, column, flex-start, space-between);
+    }
   }
 }

@@ -14,21 +14,36 @@
             flex-direction:row;
             align-items:center;
             justify-content:space-around;
-            /*overflow: hidden;*/
+            padding: 10px;
         }
-        .section .box{
-            flex-basis:25%;
-            text-align:right;
+        .section.vertical{
+            margin-top: 20px;
         }
+        .section.vertical .uk-steps {
+            width: 100%;
+        }
+
     </style>
 </head>
 <body class="ui-kits">
-<section class="section">
-
-</section>
+<section class="section horizonal"></section>
+<section class="section vertical"></section>
 </body>
 <script type="text/javascript">
-    $('.section').stepsbar({
+    var inst4horizonal = $('.horizonal').stepsbar({
+        direction: 'horizonal',
+        current: 2,
+        space: '200px',
+        steps: [
+            {label:'步骤1', desc:'描述描述描述描述描述描述描述描述', icon:null, render: '<p>111</p>'},
+            {label:'步骤2', desc:'描述描述', icon:null, render: '<p>222</p>'},
+            {label:'步骤3', desc:'描述描述', icon:null, render: '<p>333</p>'},
+            {label:'步骤4', desc:'描述描述描述描述描述描述描述描述', icon:null, render: '<p>444</p>'},
+        ]
+    });
+
+    var inst4vertical = $('.vertical').stepsbar({
+        direction: 'vertical',
         current: 2,
         space: '200px',
         steps: [
